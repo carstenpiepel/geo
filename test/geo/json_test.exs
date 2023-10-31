@@ -363,7 +363,17 @@ defmodule Geo.JSON.Test do
     """
 
     geom = Jason.decode!(json) |> Geo.JSON.decode!()
-    assert is_nil(geom)
+    %Geo.Unlocated{} = geom
+    assert geom.properties["context"] == "80, Somme, Picardie"
+  end
+
+  test "Encode unlocted feature" do
+    geom = %Geo.Unlocated{properties: %{hi: "there"}}
+    json = Geo.JSON.encode!(geom) |> Jason.encode!()
+
+    assert(
+      json == "{\"geometry\":null,\"properties\":{\"hi\":\"there\"},\"type\":\"Feature\"}"
+    )
   end
 
   test "Decode feature in a feature collection with null geometry" do
@@ -384,7 +394,9 @@ defmodule Geo.JSON.Test do
     """
 
     geom = Jason.decode!(json) |> Geo.JSON.decode!()
-    assert geom.geometries == []
+    [geom] = geom.geometries
+    %Geo.Unlocated{} = geom
+    assert geom.properties["context"] == "80, Somme, Picardie"
   end
 
   property "encodes and decodes back to the correct Point struct" do

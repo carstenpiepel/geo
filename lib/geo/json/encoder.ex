@@ -15,7 +15,8 @@ defmodule Geo.JSON.Encoder do
     MultiLineStringZ,
     MultiPolygon,
     MultiPolygonZ,
-    GeometryCollection
+    GeometryCollection,
+    Unlocated
   }
 
   defmodule EncodeError do
@@ -149,7 +150,7 @@ defmodule Geo.JSON.Encoder do
 
   defp do_encode(%LineStringZM{coordinates: coordinates}) do
     # GeoJSON does not allow "m", and does not recognize "LineStringZM" as
-    # a type 
+    # a type
     coordinates = Enum.map(coordinates, fn {x, y, z, _m} -> [x, y, z] end)
     %{"type" => "LineString", "coordinates" => coordinates}
   end
@@ -222,6 +223,10 @@ defmodule Geo.JSON.Encoder do
       end)
 
     %{"type" => "MultiPolygon", "coordinates" => coordinates}
+  end
+
+  defp do_encode(%Unlocated{} = _geom) do
+    %{"type" => "Feature", "geometry" => nil}
   end
 
   defp do_encode(data) do

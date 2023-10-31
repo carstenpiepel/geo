@@ -13,7 +13,8 @@ defmodule Geo.JSON.Decoder do
     MultiLineStringZ,
     MultiPolygon,
     MultiPolygonZ,
-    GeometryCollection
+    GeometryCollection,
+    Unlocated
   }
 
   defmodule DecodeError do
@@ -194,7 +195,9 @@ defmodule Geo.JSON.Decoder do
     %MultiPolygonZ{coordinates: coordinates, srid: get_srid(crs), properties: properties}
   end
 
-  defp do_decode("Feature", nil, _properties, _id), do: nil
+  defp do_decode("Feature", nil, properties, _id) do
+    %Unlocated{properties: properties}
+  end
 
   defp do_decode("Feature", geometry, properties, _id) do
     do_decode(Map.get(geometry, "type"), Map.get(geometry, "coordinates"), properties, nil)
